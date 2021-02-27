@@ -1,4 +1,27 @@
-// TODO: Insert license text
+/*
+ *  This file is part of the dsa-verify library (https://github.com/marcizhu/dsa-verify)
+ *
+ *  Copyright (C) 2021 Marc Izquierdo
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a
+ *  copy of this software and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction, including without limitation
+ *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -49,39 +72,43 @@ error:
 	return DSA_GENERIC_ERROR;
 }
 
-int dsa_verify_blob(const char* data, size_t data_len, const char* pubkey, const char* sig)
+int dsa_verify_blob(const unsigned char* data, size_t data_len, const char* pubkey, const char* sig)
 {
-	SHA1Context ctx;
 	uint8_t sha1sum[SHA1_HASH_SIZE];
-	SHA1_reset(&ctx);
-	SHA1_input(&ctx, (const unsigned char*)data, data_len);
-	SHA1_result(&ctx, sha1sum);
+	SHA1(sha1sum, data, data_len);
 
 	return dsa_verify_hash(sha1sum, pubkey, sig);
 }
 
 int dsa_verify_hash(const uint8_t sha1[SHA1_HASH_SIZE], const char* pubkey, const char* sig)
 {
-	SHA1Context ctx;
 	uint8_t sha1sum[SHA1_HASH_SIZE];
-	SHA1_reset(&ctx);
-	SHA1_input(&ctx, (const unsigned char*)sha1, SHA1_HASH_SIZE);
-	SHA1_result(&ctx, sha1sum);
+	SHA1(sha1sum, (const unsigned char*)sha1, SHA1_HASH_SIZE);
 
-	size_t key_len = BASE64_DECODE_OUT_SIZE(strlen(pubkey));
-	size_t sig_len = BASE64_DECODE_OUT_SIZE(strlen(sig));
+	size_t key_in_len = strlen(pubkey);
+	size_t sig_in_len = strlen(sig);
+	size_t key_len = BASE64_DECODE_OUT_SIZE(key_in_len);
+	size_t sig_len = BASE64_DECODE_OUT_SIZE(sig_in_len);
 
+	int ret;
 	unsigned char* key_der = malloc(key_len);
 	unsigned char* sig_der = malloc(sig_len);
 
-	if((key_len = pem2der(pubkey, strlen(pubkey), key_der)) == 0)
-		return DSA_KEY_FORMAT_ERROR;
+	if((key_len = pem2der(pubkey, key_in_len, key_der)) == 0)
+	{
+		ret = DSA_KEY_FORMAT_ERROR;
+		goto error;
+	}
 
-	if((sig_len = base64_decode(sig, strlen(sig), sig_der)) == 0)
-		return DSA_SIGN_FORMAT_ERROR;
+	if((sig_len = base64_decode(sig, sig_in_len, sig_der)) == 0)
+	{
+		ret = DSA_SIGN_FORMAT_ERROR;
+		goto error;
+	}
 
-	int ret = dsa_verify_hash_der(sha1sum, key_der, key_len, sig_der, sig_len);
+	ret = dsa_verify_hash_der(sha1sum, key_der, key_len, sig_der, sig_len);
 
+error:
 	free(key_der);
 	free(sig_der);
 

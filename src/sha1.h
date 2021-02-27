@@ -1,83 +1,75 @@
 /*
- *  sha1.h
- *
- *  Description:
- *      This is the header file for code which implements the Secure
- *      Hashing Algorithm 1 as defined in FIPS PUB 180-1 published
- *      April 17, 1995.
- *
- *      Many of the variable names in this code, especially the
- *      single character names, were used because those were the names
- *      used in the publication.
- *
- *      Please read the file sha1.c for more information.
- *
- */
+SHA-1 in C
+By Steve Reid <steve@edmweb.com>
+100% Public Domain
+*/
 
 #ifndef __SHA1_H__
 #define __SHA1_H__
 
 #include <stdint.h>
 
-/*
- * If you do not have the ISO standard stdint.h header file, then you
- * must typdef the following:
- *    name              meaning
- *  uint32_t         unsigned 32 bit integer
- *  uint8_t          unsigned 8 bit integer (i.e., unsigned char)
- *  int_least16_t    integer of >= 16 bits
- *
- */
-
-enum
+/** @brief SHA1 context */
+typedef struct
 {
-    SHA_SUCCESS = 0,    ///< Hash was successful
-    SHA_NULL,           ///< NULL pointer parameter
-    SHA_INPUT_TOO_LONG, ///< Input data too long
-    SHA_STATE_ERROR     ///< Called Input after Result
-};
+    uint32_t state[5];
+    uint32_t count[2];
+    unsigned char buffer[64];
+} SHA1_CTX;
 
-/** @brief Size of a SHA1 hash, in bytes */
+/** @brief SHA1 hash size, in bytes */
 #define SHA1_HASH_SIZE 20
 
-/*
- *  This structure will hold context information for the SHA-1
- *  hashing operation
+/**
+ * @brief Reset SHA1 context
+ *
+ * Resets the given SHA1 context, setting it to a default state. This function
+ * can be called at any time, and thus allows to reuse the same context to
+ * calculate many SHA1 hashes.
+ *
+ * @param[in,out] context  SHA1 context
  */
-typedef struct SHA1Context
-{
-    uint32_t Intermediate_Hash[SHA1_HASH_SIZE / 4]; /* Message Digest  */
-
-    uint32_t Length_Low;            /* Message length in bits      */
-    uint32_t Length_High;           /* Message length in bits      */
-
-                               /* Index into message block array   */
-    int_least16_t Message_Block_Index;
-    uint8_t Message_Block[64];      /* 512-bit message blocks      */
-
-    int Computed;              /* Is the digest computed?         */
-    int Corrupted;             /* Is the message digest corrupted? */
-} SHA1Context;
-
-/*
- *  Function Prototypes
- */
-
-/** @brief Reset SHA1 state */
-int SHA1_reset(SHA1Context*);
-
-/** @brief Compute hash of given data */
-int SHA1_input(SHA1Context*, const uint8_t* message_array, unsigned int len);
+void SHA1_reset(SHA1_CTX* context);
 
 /**
- * @brief Get SHA1 hash of the computed data.
+ * @brief Feed data to SHA1 hash
  *
- * Returns the hash using the second parameter. Internal state is invalid after
- * this function is called.
+ * This function takes some data and processes it to calculate the SHA1 hash.
+ * This function *MUST* be called after a call to @ref SHA1_reset(), and it
+ * can be called as many times as necessary in order to feed all the data the
+ * user wants. Once all data has been fed, call @ref SHA1_result() to get the
+ * final hash value.
  *
- * @returns @ref SHA_SUCCESS on success, otherwise it returns any of @ref
- * SHA_NULL, @ref SHA_INPUT_TOO_LONG or @ref SHA_STATE_ERROR.
+ * @param[in,out] context  SHA1 context
+ * @param[in]     data     Data to be fed to the algorithm
+ * @param[in]     len      Length of the data to be fed
  */
-int SHA1_result(SHA1Context*, uint8_t message_digest[SHA1_HASH_SIZE]);
+void SHA1_input(SHA1_CTX* context, const unsigned char* data, uint32_t len);
+
+/**
+ * @brief Get the SHA1 hash of the previously-fed data
+ *
+ * Generates the SHA1 hash based on the data fed previously using the function
+ * @ref SHA1_input(). This function leaves the context in an invalid state. Thus,
+ * in order to reuse the same context it is necessary to call @ref SHA1_reset().
+ * If no more hashes are desired, the context can be left as is, no cleanup is
+ * necessary.
+ *
+ * @param[in,out] context  SHA1 context
+ * @param[out]    digest   SHA1 hash output
+ */
+void SHA1_result(SHA1_CTX* context, uint8_t digest[SHA1_HASH_SIZE]);
+
+/**
+ * @brief Calculate SHA1 of given data
+ *
+ * Calculates the SHA1 hash of the given data, without the need to create and
+ * initialize the SHA1 context. Useful to hash a single block of data at once.
+ *
+ * @param[out] digest  Array where the SHA1 hash will be stored
+ * @param[in]  data    Byte-array of the data to be hashed
+ * @param[in]  len     Length of the byte-array of data, in bytes.
+ */
+void SHA1(uint8_t digest[SHA1_HASH_SIZE], const unsigned char* data, uint32_t len);
 
 #endif

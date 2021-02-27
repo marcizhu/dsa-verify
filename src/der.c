@@ -1,3 +1,28 @@
+/*
+ *  This file is part of the dsa-verify library (https://github.com/marcizhu/dsa-verify)
+ *
+ *  Copyright (C) 2021 Marc Izquierdo
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a
+ *  copy of this software and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction, including without limitation
+ *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 #include <stddef.h>
 #include <string.h>
 
@@ -44,10 +69,10 @@ static const unsigned char base64de[] =
 
 size_t base64_decode(const char* in, size_t inlen, unsigned char* out)
 {
-	unsigned int j = 0;
-	unsigned int ignored = 0;
+	size_t j = 0;
+	size_t ignored = 0;
 
-	for (unsigned int i = 0; i < inlen; i++)
+	for (size_t i = 0; i < inlen; i++)
 	{
 		if (in[i] == BASE64_PAD)
 			break;
@@ -129,14 +154,6 @@ static int dearmor(const char** pem, size_t* len)
 	return 1;
 }
 
-enum TagClass
-{
-	TagClass_Universal       = 0,
-	TagClass_Application     = 1,
-	TagClass_ContextSpecific = 2,
-	TagClass_Private         = 3
-};
-
 enum ASN1_Type
 {
 	ASN1_Type_EOC               =  0,
@@ -178,10 +195,6 @@ enum ASN1_Type
 	ASN1_Type_RELATIVE_OID_IRI  = 36,
 };
 
-#define ASN1_TAG_CLASS(x)        ((enum TagClass)((x >> 6) & 0x03))
-#define ASN1_TAG_CONSTRUCTED(x)  ((int)((x >> 5) & 0x01))
-#define ASN1_TAG_NUMBER(x)       ((unsigned int)((x >> 0) & 0x1F))
-
 static size_t _parse_length(const unsigned char** der)
 {
 	if(((**der & 0x80) >> 7) == 0)
@@ -204,6 +217,9 @@ static size_t _parse_length(const unsigned char** der)
 	return 0;
 }
 
+#define ASN1_TAG_CONSTRUCTED(x)  ((int)((x >> 5) & 0x01))
+#define ASN1_TAG_NUMBER(x)       ((unsigned int)((x >> 0) & 0x1F))
+
 #define SEQUENCE          if(ASN1_TAG_CONSTRUCTED(*der) == 1 && ASN1_TAG_NUMBER(*der) == ASN1_Type_SEQUENCE)
 #define INTEGER           if(ASN1_TAG_CONSTRUCTED(*der) == 0 && ASN1_TAG_NUMBER(*der) == ASN1_Type_INTEGER)
 #define OBJECT_IDENTIFIER if(ASN1_TAG_CONSTRUCTED(*der) == 0 && ASN1_TAG_NUMBER(*der) == ASN1_Type_OBJECT_IDENTIFIER)
@@ -216,12 +232,12 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 
 	SEQUENCE
 	{
-		if((++der + _parse_length(&der)) > end)
+		if ((++der + _parse_length(&der)) > end)
 			return 0;
 
 		SEQUENCE
 		{
-			if((++der + _parse_length(&der)) > end)
+			if ((++der + _parse_length(&der)) > end)
 				return 0;
 
 			OBJECT_IDENTIFIER
@@ -229,7 +245,7 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 				der++;
 				size_t length = _parse_length(&der);
 
-				if(memcmp(der, ansi_x9_57, length) != 0)
+				if (length == sizeof(ansi_x9_57) && memcmp(der, ansi_x9_57, length) != 0)
 					return 0;
 
 				der += length;
@@ -237,7 +253,7 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 
 			SEQUENCE
 			{
-				if((++der + _parse_length(&der)) > end)
+				if ((++der + _parse_length(&der)) > end)
 					return 0;
 
 				INTEGER
@@ -246,10 +262,10 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 					der++;
 					size_t length = _parse_length(&der);
 
-					if((der + length) > end)
+					if ((der + length) > end)
 						return 0;
 
-					if(mp_read_unsigned_bin(keyP, der, length) != MP_OKAY)
+					if (mp_read_unsigned_bin(keyP, der, length) != MP_OKAY)
 						return 0;
 
 					der += length;
@@ -261,10 +277,10 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 					der++;
 					size_t length = _parse_length(&der);
 
-					if((der + length) > end)
+					if ((der + length) > end)
 						return 0;
 
-					if(mp_read_unsigned_bin(keyQ, der, length) != MP_OKAY)
+					if (mp_read_unsigned_bin(keyQ, der, length) != MP_OKAY)
 						return 0;
 
 					der += length;
@@ -276,10 +292,10 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 					der++;
 					size_t length = _parse_length(&der);
 
-					if((der + length) > end)
+					if ((der + length) > end)
 						return 0;
 
-					if(mp_read_unsigned_bin(keyG, der, length) != MP_OKAY)
+					if (mp_read_unsigned_bin(keyG, der, length) != MP_OKAY)
 						return 0;
 
 					der += length;
@@ -289,10 +305,10 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 
 		BIT_STRING
 		{
-			if((++der + _parse_length(&der)) > end)
+			if ((++der + _parse_length(&der)) > end)
 				return 0;
 
-			if(*der++ != 0)
+			if (*der++ != 0)
 				return 0;
 
 			INTEGER
@@ -301,7 +317,7 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 				der++;
 				size_t length = _parse_length(&der);
 
-				if((der + length) > end)
+				if ((der + length) > end)
 					return 0;
 
 				return (mp_read_unsigned_bin(keyY, der, length) == MP_OKAY);
@@ -327,10 +343,10 @@ int parse_der_signature(const unsigned char* der, size_t len, mp_int* r, mp_int*
 			der++;
 			size_t length = _parse_length(&der);
 
-			if((der + length) > end)
+			if ((der + length) > end)
 				return 0;
 
-			if(mp_read_unsigned_bin(r, der, length) != MP_OKAY)
+			if (mp_read_unsigned_bin(r, der, length) != MP_OKAY)
 				return 0;
 
 			der += length;

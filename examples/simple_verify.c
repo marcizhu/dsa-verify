@@ -49,7 +49,7 @@ int main()
 		"MEQCIBsQNidBcx7MOGcMEkItVEx0iru9T7Ln6cN+3OMB5lie"
 		"AiADvUlM2HhsZk9Uq/hK/DsSd6/+aMUMqeCDu92vPVuNBQ==";
 
-	if(dsa_verify_blob(message, strlen(message), public_key, signature) == DSA_VERIFICATION_OK)
+	if (dsa_verify_blob((const unsigned char*)message, strlen(message), public_key, signature) == DSA_VERIFICATION_OK)
 		puts("Verification OK");
 	else
 		puts("Verification FAILED");
