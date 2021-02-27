@@ -14,6 +14,7 @@ lib: include/dsa_verify.h
 
 examples: lib include/dsa_verify.h
 	$(COMPILER) $(OPTIONS) -o simple_verify examples/simple_verify.c *.o $(LIBRARY)
+	$(COMPILER) $(OPTIONS) -o dsa-verify examples/verify_tool.c *.o $(LIBRARY)
 
 clean:
 	rm -f *.o

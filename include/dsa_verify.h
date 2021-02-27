@@ -61,7 +61,7 @@ extern "C" {
  * @param sig       Null-terminated string with the signature of the file,
  *                  encoded in base64.
  *
- * @returns 1 (@ref DSA_VERIFICATION_OK) on success, 0 (@ref DSA_VERIFICATION_FAILED)
+ * @returns Returns 1 (@ref DSA_VERIFICATION_OK) on success, 0 (@ref DSA_VERIFICATION_FAILED)
  * on verification failure or any of @ref DSA_GENERIC_ERROR, @ref DSA_KEY_FORMAT_ERROR,
  * @ref DSA_KEY_PARAM_ERROR, @ref DSA_SIGN_FORMAT_ERROR or @ref DSA_SIGN_PARAM_ERROR
  * on error.
@@ -80,7 +80,7 @@ int dsa_verify_blob(const unsigned char* data, size_t data_len, const char* pubk
  * @param sig       Null-terminated string with the signature of the file,
  *                  encoded in base64.
  *
- * @returns 1 (@ref DSA_VERIFICATION_OK) on success, 0 (@ref DSA_VERIFICATION_FAILED)
+ * @returns Returns 1 (@ref DSA_VERIFICATION_OK) on success, 0 (@ref DSA_VERIFICATION_FAILED)
  * on verification failure or any of @ref DSA_GENERIC_ERROR, @ref DSA_KEY_FORMAT_ERROR,
  * @ref DSA_KEY_PARAM_ERROR, @ref DSA_SIGN_FORMAT_ERROR or @ref DSA_SIGN_PARAM_ERROR
  * on error.
@@ -98,7 +98,7 @@ int dsa_verify_hash(const uint8_t sha1[SHA1_HASH_SIZE], const char* pubkey, cons
  * @param sig         Binary DER representation of the signature of the file
  * @param sig_len     Length of the signature
  *
- * @returns 1 (@ref DSA_VERIFICATION_OK) on success, 0 (@ref DSA_VERIFICATION_FAILED)
+ * @returns Returns 1 (@ref DSA_VERIFICATION_OK) on success, 0 (@ref DSA_VERIFICATION_FAILED)
  * on verification failure or any of @ref DSA_GENERIC_ERROR, @ref DSA_KEY_FORMAT_ERROR,
  * @ref DSA_KEY_PARAM_ERROR, @ref DSA_SIGN_FORMAT_ERROR or @ref DSA_SIGN_PARAM_ERROR
  * on error.

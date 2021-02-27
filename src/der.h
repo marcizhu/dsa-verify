@@ -33,10 +33,59 @@
 /** @brief Returns an upper bound of the number of bytes used by a base-64 encoded string */
 #define BASE64_DECODE_OUT_SIZE(s)  ((unsigned int)(((s) / 4) * 3))
 
+/**
+ * @brief Decode base64 data
+ *
+ * Reads base64 data and outputs the binary contents to `out`. Returns 0 on error,
+ * or the number of bytes used on success. `out` is expected to be at least
+ * `BASE64_DECODE_OUT_SIZE(inlen)` bytes long.
+ *
+ * @param[in]  in     Input base64 data
+ * @param[in]  inlen  Length of the base64 data
+ * @param[out] out    Output array where the decoded data will be stored
+ *
+ * @returns Returns 0 on error, or the number of bytes written on success.
+ *
+ * @see @ref BASE64_DECODE_OUT_SIZE()
+ */
 size_t base64_decode(const char* in, size_t inlen, unsigned char* out);
 
+/**
+ * @brief Parse a public key in DER format
+ *
+ * Parses a public key in DER format and returns its parameters (p, q, g, y).
+ * This function doesn't implement a full DER parser, but rather relies on the
+ * given key following the standardized format as specified in RFC 3279.
+ *
+ * @param[in]  der   Input key data, in DER format.
+ * @param[in]  len   Length of the input DER data
+ * @param[out] keyP  Output pointer where the P parameter of the key will be stored
+ * @param[out] keyQ  Output pointer where the Q parameter of the key will be stored
+ * @param[out] keyG  Output pointer where the G parameter of the key will be stored
+ * @param[out] keyY  Output pointer where the Y parameter of the key will be stored
+ *
+ * @return Returns 0 on error, 1 on success
+ *
+ * @see @ref parse_der_signature()
+ */
 int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int* keyQ, mp_int* keyG, mp_int* keyY);
 
+/**
+ * @brief Parse a signature in DER format
+ *
+ * Parses a signature in DER format and returns its parameters (r, s). This
+ * function doesn't implement a full DER parser, but rather relies on the given
+ * key following the standardized format as specified in RFC 3279.
+ *
+ * @param[in]  der  Input key data, in DER format.
+ * @param[in]  len  Length of the input DER data
+ * @param[out] r    Output pointer where the r parameter of the key will be stored
+ * @param[out] s    Output pointer where the s parameter of the key will be stored
+ *
+ * @return Returns 0 on error, 1 on success
+ *
+ * @see @ref parse_der_pubkey()
+ */
 int parse_der_signature(const unsigned char* der, size_t len, mp_int* r, mp_int* s);
 
 /**
@@ -51,8 +100,8 @@ int parse_der_signature(const unsigned char* der, size_t len, mp_int* r, mp_int*
  * @param[out] out  Where to store the DER data. It should be at least
  *                  `BASE64_DECODE_OUT_SIZE(len)` bytes long.
  *
- * @returns 0 on error, otherwise returns the number of bytes the DER encoding
- * uses.
+ * @returns Returns 0 on error, otherwise returns the number of bytes the DER
+ * encoding uses.
  */
 size_t pem2der(const char* pem, size_t len, unsigned char* out);
 
