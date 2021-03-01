@@ -31,13 +31,11 @@
 #include "mp_math.h"
 #include "sha1.h"
 
-#define MP_OP(op) if ((ret = (op)) != MP_OKAY) goto error;
+#define MP_OP(op) if ((op) != MP_OKAY) goto error;
 
 static int _dsa_verify_hash(mp_int* hash, mp_int* keyP, mp_int* keyQ, mp_int* keyG, mp_int* keyY, mp_int* r, mp_int* s)
 {
-	int ret;
 	mp_int w, v, u1, u2;
-
 	MP_OP(mp_init_multi(&w, &v, &u1, &u2, NULL));
 
 	// Check 0 < r < q and 0 < s < q
@@ -62,7 +60,7 @@ static int _dsa_verify_hash(mp_int* hash, mp_int* keyP, mp_int* keyQ, mp_int* ke
 	MP_OP(mp_mulmod(&u1, &u2, keyP, &v));    // v := u1 * u2 mod p
 	MP_OP(mp_mod(&v, keyQ, &v));             // v := v mod q
 
-	ret = (mp_cmp(r, &v) == MP_EQ ? DSA_VERIFICATION_OK : DSA_VERIFICATION_FAILED);
+	int ret = (mp_cmp(r, &v) == MP_EQ ? DSA_VERIFICATION_OK : DSA_VERIFICATION_FAILED);
 	mp_clear_multi(&w, &v, &u1, &u2, NULL);
 
 	return ret;
@@ -121,14 +119,14 @@ int dsa_verify_hash_der(const uint8_t sha1[SHA1_HASH_SIZE], const unsigned char*
 	mp_int keyP, keyQ, keyG, keyY;
 	mp_init_multi(&keyP, &keyQ, &keyG, &keyY, NULL);
 
-	if(parse_der_pubkey(pubkey, pubkey_len, &keyP, &keyQ, &keyG, &keyY) == 0)
+	if (parse_der_pubkey(pubkey, pubkey_len, &keyP, &keyQ, &keyG, &keyY) == 0)
 		return DSA_KEY_PARAM_ERROR;
 
 	// Parse signature
 	mp_int r, s;
 	mp_init_multi(&r, &s, NULL);
 
-	if(parse_der_signature(sig, sig_len, &r, &s) == 0)
+	if (parse_der_signature(sig, sig_len, &r, &s) == 0)
 		return DSA_SIGN_PARAM_ERROR;
 
 	// Read hash, verify data

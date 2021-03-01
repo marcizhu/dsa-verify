@@ -51,7 +51,7 @@ extern "C" {
  * Verify a given blob
  *
  * This function verifies a blob of data using the given public key and signature.
- * Effectively hashes the blob using SHA1 and afterwards calls @ref dsa_verify_hash
+ * Effectively hashes the blob using SHA1 and afterwards calls @ref dsa_verify_hash()
  * in order to verify data validity.
  *
  * @param data      Pointer to the beginning of the data blob
@@ -92,7 +92,7 @@ int dsa_verify_hash(const uint8_t sha1[SHA1_HASH_SIZE], const char* pubkey, cons
  *
  * This function verifies a SHA1 hash using the given public key and signature.
  *
- * @param sha1      SHA1 hash to be verified
+ * @param sha1        SHA1 hash to be verified
  * @param pubkey      Binary DER representation of the public key
  * @param pubkey_len  Lenght of the public key
  * @param sig         Binary DER representation of the signature of the file

@@ -1,6 +1,6 @@
 # DSA signature verification library :closed_lock_with_key:
 
-Small & straightforward C library to verify a blob or hash of data against a DSA public key and a DSA signature. Cross-platform and with a small memory footprint (only a single `malloc()` is used throughout the entire library). Very intuitive and fast. Easily usable with other languages such as C++ due to the simple interface.
+Small & straightforward C library to verify a blob or hash of data against a DSA public key and a DSA signature. Cross-platform and with a small memory footprint (only two `malloc()` calls are used throughout the entire library). Very intuitive and fast. Easily usable with other languages such as C++ due to its simple interface.
 
 
 ## Generating DSA keys
@@ -44,7 +44,7 @@ const char* signature =
     "MEQCIBsQNidBcx7MOGcMEkItVEx0iru9T7Ln6cN+3OMB5lie"
     "AiADvUlM2HhsZk9Uq/hK/DsSd6/+aMUMqeCDu92vPVuNBQ==";
 
-if(dsa_verify_blob(contents, strlen(contents), public_key, signature) == DSA_VERIFICATION_OK)
+if (dsa_verify_blob(contents, strlen(contents), public_key, signature) == DSA_VERIFICATION_OK)
     puts("Verification OK");
 else
     puts("Verification FAILURE");

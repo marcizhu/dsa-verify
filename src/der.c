@@ -245,7 +245,7 @@ int parse_der_pubkey(const unsigned char* der, size_t len, mp_int* keyP, mp_int*
 				der++;
 				size_t length = _parse_length(&der);
 
-				if (length == sizeof(ansi_x9_57) && memcmp(der, ansi_x9_57, length) != 0)
+				if (length != sizeof(ansi_x9_57) || (length == sizeof(ansi_x9_57) && memcmp(der, ansi_x9_57, length) != 0))
 					return 0;
 
 				der += length;
@@ -334,7 +334,7 @@ int parse_der_signature(const unsigned char* der, size_t len, mp_int* r, mp_int*
 
 	SEQUENCE
 	{
-		if((++der + _parse_length(&der)) > end)
+		if ((++der + _parse_length(&der)) > end)
 			return 0;
 
 		INTEGER
@@ -358,7 +358,7 @@ int parse_der_signature(const unsigned char* der, size_t len, mp_int* r, mp_int*
 			der++;
 			size_t length = _parse_length(&der);
 
-			if((der + length) > end)
+			if ((der + length) > end)
 				return 0;
 
 			return (mp_read_unsigned_bin(s, der, length) == MP_OKAY);
@@ -373,7 +373,7 @@ size_t pem2der(const char* pem, size_t len, unsigned char* out)
 	const char* begin = pem;
 	size_t pem_len = len;
 
-	if(dearmor(&begin, &pem_len) == 0)
+	if (dearmor(&begin, &pem_len) == 0)
 		return 0;
 
 	return base64_decode(begin, pem_len, (unsigned char*)out);

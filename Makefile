@@ -13,8 +13,10 @@ lib: include/dsa_verify.h
 	$(COMPILER) -c $(OPTIONS) -o sha1.o       src/sha1.c       $(LIBRARY)
 
 examples: lib include/dsa_verify.h
-	$(COMPILER) $(OPTIONS) -o simple_verify examples/simple_verify.c *.o $(LIBRARY)
+	$(COMPILER) $(OPTIONS) -o simple-verify examples/simple_verify.c *.o $(LIBRARY)
 	$(COMPILER) $(OPTIONS) -o dsa-verify examples/verify_tool.c *.o $(LIBRARY)
 
 clean:
 	rm -f *.o
+	rm -f simple-verify
+	rm -f dsa-verify

@@ -35,9 +35,9 @@ int main(int argc, char* argv[])
 	}
 
 	size_t file_len;
-	const char* file_contents = read_file(argv[1], &file_len);
-	const char* public_key = read_file(argv[2], NULL);
-	const char* signature = read_file(argv[3], NULL);
+	char* file_contents = read_file(argv[1], &file_len);
+	char* public_key = read_file(argv[2], NULL);
+	char* signature = read_file(argv[3], NULL);
 
 	int ret = dsa_verify_blob((const unsigned char*)file_contents, file_len, public_key, signature);
 
@@ -56,6 +56,10 @@ int main(int argc, char* argv[])
 			case DSA_SIGN_FORMAT_ERROR: puts("Signature format is invalid!"); break;
 		}
 	}
+
+	free(file_contents);
+	free(public_key);
+	free(signature);
 
 	return !(ret == DSA_VERIFICATION_OK);
 }
