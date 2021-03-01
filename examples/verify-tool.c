@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "dsa_verify.h"
+#include "dsa-verify.h"
 
 // This is a simple tool that allows anyone to easily verify DSA signatures from
 // the command line

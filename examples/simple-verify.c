@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "dsa_verify.h"
+#include "dsa-verify.h"
 
 int main()
 {

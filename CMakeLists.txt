@@ -30,14 +30,14 @@ message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
 
 if(DSA_VERIFY_BUILD_EXAMPLES)
 	# simple-verify
-	add_executable(simple-verify examples/simple_verify.c)
+	add_executable(simple-verify examples/simple-verify.c)
 	target_link_libraries(simple-verify dsa-verify)
 
 	# dsa-verify
-	add_executable(verify examples/verify_tool.c)
+	add_executable(verify examples/verify-tool.c)
 	target_link_libraries(verify dsa-verify)
 endif()
 
-add_library(dsa-verify STATIC src/der.c src/dsa_verify.c src/mp_math.c src/sha1.c)
+add_library(dsa-verify STATIC src/der.c src/dsa-verify.c src/mp_math.c src/sha1.c)
 target_include_directories(dsa-verify PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(dsa-verify PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

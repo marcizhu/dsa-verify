@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dsa_verify.h"
+#include "dsa-verify.h"
 #include "der.h"
 #include "mp_math.h"
 #include "sha1.h"
