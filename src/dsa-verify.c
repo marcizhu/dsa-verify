@@ -29,6 +29,8 @@
 #include "dsa-verify.h"
 #include "der.h"
 #include "mp_math.h"
+
+#define SHA1_IMPLEMENTATION
 #include "sha1.h"
 
 #define MP_OP(op) if ((op) != MP_OKAY) goto error;
@@ -72,33 +74,31 @@ error:
 
 int dsa_verify_blob(const unsigned char* data, size_t data_len, const char* pubkey, const char* sig)
 {
-	uint8_t sha1sum[SHA1_HASH_SIZE];
+	SHA1_t sha1sum;
 	SHA1(sha1sum, data, data_len);
 
 	return dsa_verify_hash(sha1sum, pubkey, sig);
 }
 
-int dsa_verify_hash(const uint8_t sha1[SHA1_HASH_SIZE], const char* pubkey, const char* sig)
+int dsa_verify_hash(const SHA1_t sha1, const char* pubkey, const char* sig)
 {
-	uint8_t sha1sum[SHA1_HASH_SIZE];
+	SHA1_t sha1sum;
 	SHA1(sha1sum, (const unsigned char*)sha1, SHA1_HASH_SIZE);
 
-	size_t key_in_len = strlen(pubkey);
-	size_t sig_in_len = strlen(sig);
-	size_t key_len = BASE64_DECODE_OUT_SIZE(key_in_len);
-	size_t sig_len = BASE64_DECODE_OUT_SIZE(sig_in_len);
+	size_t key_len = strlen(pubkey);
+	size_t sig_len = strlen(sig);
 
 	int ret;
-	unsigned char* key_der = malloc(key_len);
-	unsigned char* sig_der = malloc(sig_len);
+	unsigned char* key_der = malloc(BASE64_DECODE_OUT_SIZE(key_len));
+	unsigned char* sig_der = malloc(BASE64_DECODE_OUT_SIZE(sig_len));
 
-	if((key_len = pem2der(pubkey, key_in_len, key_der)) == 0)
+	if((key_len = pem2der(pubkey, key_len, key_der)) == 0)
 	{
 		ret = DSA_KEY_FORMAT_ERROR;
 		goto error;
 	}
 
-	if((sig_len = base64_decode(sig, sig_in_len, sig_der)) == 0)
+	if((sig_len = base64_decode(sig, sig_len, sig_der)) == 0)
 	{
 		ret = DSA_SIGN_FORMAT_ERROR;
 		goto error;
@@ -113,7 +113,7 @@ error:
 	return ret;
 }
 
-int dsa_verify_hash_der(const uint8_t sha1[SHA1_HASH_SIZE], const unsigned char* pubkey, size_t pubkey_len, const unsigned char* sig, size_t sig_len)
+int dsa_verify_hash_der(const SHA1_t sha1, const unsigned char* pubkey, size_t pubkey_len, const unsigned char* sig, size_t sig_len)
 {
 	// Parse public key
 	mp_int keyP, keyQ, keyG, keyY;

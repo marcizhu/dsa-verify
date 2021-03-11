@@ -32,6 +32,9 @@
 /** @brief Size of a SHA1 hash, in bytes */
 #define SHA1_HASH_SIZE 20
 
+/** @brief Alias for SHA1 hash */
+typedef uint8_t SHA1_t[SHA1_HASH_SIZE];
+
 enum
 {
 	DSA_VERIFICATION_OK     =  1, ///< Verification successful
@@ -74,7 +77,6 @@ int dsa_verify_blob(const unsigned char* data, size_t data_len, const char* pubk
  * This function verifies a SHA1 hash using the given public key and signature.
  *
  * @param sha1      SHA1 hash to be verified
- * @param data_len  Length of the data blob
  * @param pubkey    Null-terminated string with the contents of the public key,
  *                  in PEM format.
  * @param sig       Null-terminated string with the signature of the file,
@@ -85,7 +87,7 @@ int dsa_verify_blob(const unsigned char* data, size_t data_len, const char* pubk
  * @ref DSA_KEY_PARAM_ERROR, @ref DSA_SIGN_FORMAT_ERROR or @ref DSA_SIGN_PARAM_ERROR
  * on error.
  */
-int dsa_verify_hash(const uint8_t sha1[SHA1_HASH_SIZE], const char* pubkey, const char* sig);
+int dsa_verify_hash(const SHA1_t sha1, const char* pubkey, const char* sig);
 
 /**
  * Verify a given SHA1 hash, key & signature in DER form
@@ -103,7 +105,7 @@ int dsa_verify_hash(const uint8_t sha1[SHA1_HASH_SIZE], const char* pubkey, cons
  * @ref DSA_KEY_PARAM_ERROR, @ref DSA_SIGN_FORMAT_ERROR or @ref DSA_SIGN_PARAM_ERROR
  * on error.
  */
-int dsa_verify_hash_der(const uint8_t sha1[SHA1_HASH_SIZE], const unsigned char* pubkey, size_t pubkey_len, const unsigned char* sig, size_t sig_len);
+int dsa_verify_hash_der(const SHA1_t sha1, const unsigned char* pubkey, size_t pubkey_len, const unsigned char* sig, size_t sig_len);
 
 #ifdef __cplusplus
 }

@@ -50,9 +50,9 @@ else
     puts("Verification FAILURE");
 ```
 
-Take a look at [simple_verify.c](examples/simple_verify.c) for a complete working example.
+Take a look at [simple-verify.c](examples/simple-verify.c) for a complete working example.
 
-It is also possible to verify the SHA1 hash of the file, or verify a SHA1 hash using a public key & signature in DER form (instead of the default PEM form). For more information, take a look at the [header file](include/dsa_verify.h) of the library.
+It is also possible to verify the SHA1 hash of the file, or verify a SHA1 hash using a public key & signature in DER form (instead of the default PEM form). For more information, take a look at the [header file](include/dsa-verify.h) of the library.
 
 
 ## Compiling
