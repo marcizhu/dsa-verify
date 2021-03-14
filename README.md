@@ -1,6 +1,6 @@
 # DSA signature verification library :closed_lock_with_key:
 
-Small & straightforward C library to verify a blob or hash of data against a DSA public key and a DSA signature. Cross-platform and with a small memory footprint (only two `malloc()` calls are used throughout the entire library). Very intuitive and fast. Easily usable with other languages such as C++ due to its simple interface.
+Small & straightforward C library to verify a blob or hash of data against a DSA public key and a DSA signature. Cross-platform and with a small memory footprint. Very intuitive and fast. Easily usable with other languages such as C++ due to its simple interface.
 
 
 ## Generating DSA keys
@@ -16,7 +16,7 @@ After executing those commands, there should be two new files: `dsa_priv.pem` an
 
 
 ## Signing a file
-In order to sign a document, we can use OpenSSL once again:
+To sign a document, one can use OpenSSL once again:
 ```sh
 openssl dgst -sha1 -binary < file | openssl dgst -sha1 -sign dsa_priv.pem | openssl enc -base64
 ```
@@ -44,7 +44,7 @@ const char* signature =
     "MEQCIBsQNidBcx7MOGcMEkItVEx0iru9T7Ln6cN+3OMB5lie"
     "AiADvUlM2HhsZk9Uq/hK/DsSd6/+aMUMqeCDu92vPVuNBQ==";
 
-if (dsa_verify_blob(contents, strlen(contents), public_key, signature) == DSA_VERIFICATION_OK)
+if(dsa_verify_blob(contents, strlen(contents), public_key, signature) == DSA_VERIFICATION_OK)
     puts("Verification OK");
 else
     puts("Verification FAILURE");
@@ -56,11 +56,12 @@ It is also possible to verify the SHA1 hash of the file, or verify a SHA1 hash u
 
 
 ## Compiling
-The included Makefile will compile the library and examples. You can also use the provided `CMakeLists.txt` in order to compile this library into a static library or integrate this project with yours.
+The included Makefile will compile the library into a static library as well as compile the examples. You can also use the provided `CMakeLists.txt` in order to compile this library into a static library or integrate this project with yours.
 
 
 ## Credits
 This library makes use of `mp_math`, a small subset of [LibTomMath](https://github.com/libtom/libtommath), in order to perform the key verification. It also uses a modified version of the [clibs/SHA1](https://github.com/clibs/sha1) implementation by Steve Reid, released into the Public Domain.
+
 
 ## License
 Copyright (c) 2021 Marc Izquierdo  

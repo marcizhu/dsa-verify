@@ -83,7 +83,7 @@ int dsa_verify_blob(const unsigned char* data, size_t data_len, const char* pubk
 int dsa_verify_hash(const SHA1_t sha1, const char* pubkey, const char* sig)
 {
 	SHA1_t sha1sum;
-	SHA1(sha1sum, (const unsigned char*)sha1, SHA1_HASH_SIZE);
+	SHA1(sha1sum, (const unsigned char*)sha1, sizeof(SHA1_t));
 
 	size_t key_len = strlen(pubkey);
 	size_t sig_len = strlen(sig);
@@ -116,25 +116,30 @@ error:
 int dsa_verify_hash_der(const SHA1_t sha1, const unsigned char* pubkey, size_t pubkey_len, const unsigned char* sig, size_t sig_len)
 {
 	// Parse public key
-	mp_int keyP, keyQ, keyG, keyY;
-	mp_init_multi(&keyP, &keyQ, &keyG, &keyY, NULL);
+	mp_int keyP, keyQ, keyG, keyY, r, s, hash;
+	mp_init_multi(&keyP, &keyQ, &keyG, &keyY, &r, &s, &hash, NULL);
+
+	int ret;
 
 	if (parse_der_pubkey(pubkey, pubkey_len, &keyP, &keyQ, &keyG, &keyY) == 0)
-		return DSA_KEY_PARAM_ERROR;
+	{
+		ret = DSA_KEY_PARAM_ERROR;
+		goto error;
+	}
 
 	// Parse signature
-	mp_int r, s;
-	mp_init_multi(&r, &s, NULL);
-
 	if (parse_der_signature(sig, sig_len, &r, &s) == 0)
-		return DSA_SIGN_PARAM_ERROR;
+	{
+		ret = DSA_SIGN_PARAM_ERROR;
+		goto error;
+	}
 
 	// Read hash, verify data
-	mp_int hash;
-	mp_init(&hash);
-	mp_read_unsigned_bin(&hash, sha1, SHA1_HASH_SIZE);
+	mp_read_unsigned_bin(&hash, sha1, sizeof(SHA1_t));
 
-	int ret = _dsa_verify_hash(&hash, &keyP, &keyQ, &keyG, &keyY, &r, &s);
+	ret = _dsa_verify_hash(&hash, &keyP, &keyQ, &keyG, &keyY, &r, &s);
+
+error:
 	mp_clear_multi(&keyP, &keyQ, &keyG, &keyY, &r, &s, &hash, NULL);
 
 	return ret;

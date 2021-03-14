@@ -28,11 +28,8 @@ typedef struct
     unsigned char buffer[64];
 } SHA1_CTX;
 
-/** @brief Size of a SHA1 hash, in bytes */
-#define SHA1_HASH_SIZE 20
-
 /** @brief Alias for SHA1 hash */
-typedef uint8_t SHA1_t[SHA1_HASH_SIZE];
+typedef uint8_t SHA1_t[20];
 
 /**
  * @brief Reset SHA1 context
