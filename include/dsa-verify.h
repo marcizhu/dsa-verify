@@ -34,13 +34,13 @@ typedef uint8_t SHA1_t[20];
 
 enum
 {
-	DSA_VERIFICATION_OK     =  1, ///< Verification successful
-	DSA_VERIFICATION_FAILED =  0, ///< Verification failed
-	DSA_GENERIC_ERROR       = -1, ///< Generic error, verification was not performed
-	DSA_KEY_FORMAT_ERROR    = -2, ///< Invalid public key format
-	DSA_KEY_PARAM_ERROR     = -3, ///< Invalid/missing public key parameters
-	DSA_SIGN_FORMAT_ERROR   = -4, ///< Invalid signature format
-	DSA_SIGN_PARAM_ERROR    = -5  ///< Invalid/missing signature parameters
+	DSA_VERIFICATION_OK        =  1, ///< Verification successful
+	DSA_VERIFICATION_FAILED    =  0, ///< Verification failed
+	DSA_GENERIC_ERROR          = -1, ///< Generic error, verification was not performed
+	DSA_KEY_FORMAT_ERROR       = -2, ///< Invalid public key format
+	DSA_KEY_PARAM_ERROR        = -3, ///< Invalid/missing public key parameters
+	DSA_SIGNATURE_FORMAT_ERROR = -4, ///< Invalid signature format
+	DSA_SIGNATURE_PARAM_ERROR  = -5  ///< Invalid/missing signature parameters
 };
 
 #ifdef __cplusplus

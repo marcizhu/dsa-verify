@@ -51,9 +51,9 @@ int main(int argc, char* argv[])
 		{
 			case DSA_VERIFICATION_FAILED: break;
 			case DSA_KEY_PARAM_ERROR: puts("Key is invalid!"); break;
-			case DSA_SIGN_PARAM_ERROR: puts("Signature is invalid!"); break;
+			case DSA_SIGNATURE_PARAM_ERROR: puts("Signature is invalid!"); break;
 			case DSA_KEY_FORMAT_ERROR: puts("Key format is invalid!"); break;
-			case DSA_SIGN_FORMAT_ERROR: puts("Signature format is invalid!"); break;
+			case DSA_SIGNATURE_FORMAT_ERROR: puts("Signature format is invalid!"); break;
 		}
 	}
 

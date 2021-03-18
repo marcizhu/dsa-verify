@@ -110,50 +110,6 @@ size_t base64_decode(const char* in, size_t inlen, unsigned char* out)
 	return j;
 }
 
-// This function modifies the input pointer & size so that it points to the
-// actual contents of the file, aka it skips the "---- BEGIN..." and the
-// "----- END..." sections of the key. Also it skips newlines and text before
-// the begin clause, therefore comments are somewhat allowed
-static int dearmor(const char** pem, size_t* len)
-{
-	if(!pem || !len)
-		return 0;
-
-	for(size_t i = 0; i < *len; i++)
-	{
-		if (((*pem)[i] == '\n') || ((*pem)[i] == '\r'))
-			continue;
-
-		if ((*pem)[i] != '-')
-		{
-			// read entire line
-			while ((i < *len) && ((*pem)[i] != '\n'))
-				i++;
-
-			continue;
-		}
-
-		if ((*pem)[i] == '-')
-		{
-			//read until end of line
-			while ((i < *len) && ((*pem)[i] != '\n'))
-				i++;
-
-			size_t begin = i;
-
-			while ((i < *len) && ((*pem)[i] != '-'))
-				i++;
-
-			size_t end = i;
-
-			*len = end - begin;
-			*pem = *pem + begin;
-		}
-	}
-
-	return 1;
-}
-
 enum ASN1_Type
 {
 	ASN1_Type_EOC               =  0,
@@ -370,11 +326,29 @@ int parse_der_signature(const unsigned char* der, size_t len, mp_int* r, mp_int*
 
 size_t pem2der(const char* pem, size_t len, unsigned char* out)
 {
-	const char* begin = pem;
-	size_t pem_len = len;
+	const char* end = pem + len;
+	const char* s1 = strstr(pem, "-----BEGIN");
+	const char* s2 = strstr(pem, "-----END");
 
-	if (dearmor(&begin, &pem_len) == 0)
+	if(s1 == NULL)
 		return 0;
 
-	return base64_decode(begin, pem_len, (unsigned char*)out);
+	if(s2 == NULL)
+		return 0;
+
+	s1 += 10;
+
+	while(s1 < end && *s1 != '-')
+		s1++;
+
+	while(s1 < end && *s1 == '-')
+		s1++;
+
+	if(*s1 == '\r') s1++;
+	if(*s1 == '\n') s1++;
+
+	if(s2 <= s1 || s2 > end)
+		return 0;
+
+	return base64_decode(s1, (size_t)(s2 - s1), (unsigned char*)out);
 }

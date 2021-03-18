@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dsa-verify.h"
 #include "der.h"
+#include "dsa-verify.h"
 #include "mp_math.h"
 
 #define SHA1_IMPLEMENTATION
@@ -44,7 +44,7 @@ static int _dsa_verify_hash(mp_int* hash, mp_int* keyP, mp_int* keyQ, mp_int* ke
 	if (mp_iszero(r) == MP_YES || mp_iszero(s) == MP_YES || mp_cmp(r, keyQ) != MP_LT || mp_cmp(s, keyQ) != MP_LT)
 	{
 		mp_clear_multi(&w, &v, &u1, &u2, NULL);
-		return DSA_SIGN_PARAM_ERROR;
+		return DSA_SIGNATURE_PARAM_ERROR;
 	}
 
 	// w := s^-1 mod q
@@ -62,6 +62,7 @@ static int _dsa_verify_hash(mp_int* hash, mp_int* keyP, mp_int* keyQ, mp_int* ke
 	MP_OP(mp_mulmod(&u1, &u2, keyP, &v));    // v := u1 * u2 mod p
 	MP_OP(mp_mod(&v, keyQ, &v));             // v := v mod q
 
+	// Signature is valid if r == v
 	int ret = (mp_cmp(r, &v) == MP_EQ ? DSA_VERIFICATION_OK : DSA_VERIFICATION_FAILED);
 	mp_clear_multi(&w, &v, &u1, &u2, NULL);
 
@@ -100,7 +101,7 @@ int dsa_verify_hash(const SHA1_t sha1, const char* pubkey, const char* sig)
 
 	if((sig_len = base64_decode(sig, sig_len, sig_der)) == 0)
 	{
-		ret = DSA_SIGN_FORMAT_ERROR;
+		ret = DSA_SIGNATURE_FORMAT_ERROR;
 		goto error;
 	}
 
@@ -130,7 +131,7 @@ int dsa_verify_hash_der(const SHA1_t sha1, const unsigned char* pubkey, size_t p
 	// Parse signature
 	if (parse_der_signature(sig, sig_len, &r, &s) == 0)
 	{
-		ret = DSA_SIGN_PARAM_ERROR;
+		ret = DSA_SIGNATURE_PARAM_ERROR;
 		goto error;
 	}
 
