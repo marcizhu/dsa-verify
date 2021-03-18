@@ -88,8 +88,6 @@ void SHA1(SHA1_t digest, const unsigned char* data, size_t len);
  *                               IMPLEMENTATION                               *
  ******************************************************************************/
 
-/* #define LITTLE_ENDIAN * This should be #define'd already, if true. */
-
 #include <string.h>
 #include <stdint.h>
 
